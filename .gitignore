@@ -27,6 +27,7 @@ venv/
 
 # PyTorch
 *.pth
+!best_brain_tumor_model.pth
 *.pt
 
 # Data (Don't commit large datasets)

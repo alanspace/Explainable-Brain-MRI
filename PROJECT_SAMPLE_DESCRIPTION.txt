@@ -1,0 +1,5 @@
+Sample 3: Explainable Brain MRI & Dual-Verification Agent
+Link: https://github.com/Startdust-Manor/Explainable-Brain-MRI
+
+Role: Lead Researcher & Engineer.
+Contribution: I engineered a high-stakes diagnostic pipeline combining PyTorch (ResNet-18) for classification with Grad-CAM++ for interpretability. Crucially, I developed a "Dual-Verification" safety layer where a multimodal LLM (Gemini 1.5 Pro) acts as an auditor to cross-check the CNN’s predictions against the visual heatmap. I also implemented an adaptive "Smart-Masking" technique to solve the alignment problem of heatmaps obscuring vital patient anatomy, ensuring the AI explains itself without degrading human decision-making. Published results in a technical paper and deployed via an interactive dashboard.

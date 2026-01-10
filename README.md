@@ -90,6 +90,13 @@ Explainable-Brain-MRI/
 
 ---
 
+## 🚨 Limitations & Safety
+*   **Single-Slice 2D Analysis**: The current ResNet18 model looks at a single 2D slice. Tumors that are clear in 3D volume but subtle in one axial slice may be missed. This is why we created the **Dual-Verification System**.
+*   **Contrast Media**: Our model is trained on T1-weighted images. Some tumors (e.g., small meningiomas) are isointense to brain tissue and only become visible with Gadolinium contrast, which this dataset does not consistently distinguish.
+
+---
+
+
 ## � References & Inspiration
 *   **Iftikhar et al. (2025)**: Importance of XAI in medical black-box models.
 *   **Islam et al. (2025)**: Grad-CAM++ for improved lesion localization.
