@@ -68,4 +68,4 @@ To upgrade this project from "Demo-Ready" to "Publication-Ready", we should:
 
 ---
 
-**Prepared by**: Shek Lun Leung (Quantum AI) & Sai Oop Mong, MD
+**Prepared by**: Shek Lun Leung & Sai Oop Mong, MD (Independent Researchers)

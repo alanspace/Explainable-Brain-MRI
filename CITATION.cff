@@ -1,9 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-  - family-names: "ResearchTeam"
-    given-names: "ExplainableAI"
-title: "Explainable Brain MRI: Deep Learning for Tumor Classification with Grad-CAM"
+  - family-names: "Leung"
+    given-names: "Shek Lun"
+  - family-names: "Mong"
+    given-names: "Sai Oop"
+title: "Explainable Brain MRI: Clinical-Grade Tumor Classification with Visual XAI & LLM Verification"
 version: 1.0.0
 date-released: 2026-01-10
-url: "https://github.com/your-username/Explainable-Brain-MRI"
+url: "https://github.com/Startdust-Manor/Explainable-Brain-MRI"

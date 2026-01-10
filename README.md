@@ -108,5 +108,5 @@ Explainable-Brain-MRI/
 
 ---
 
-**Author**: Shek Lun Leung (Quantum AI)
+**Author**: Shek Lun Leung (Independent Researcher)
 **License**: MIT
