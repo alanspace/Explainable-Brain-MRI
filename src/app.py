@@ -176,19 +176,19 @@ if uploaded_file is not None:
                 available_models = ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro']
                 model_gemini = None
                 
-                print(f"DEBUG: API Key loaded: {api_key[:5]}...{api_key[-5:]}")
+                # print(f"DEBUG: API Key loaded: {api_key[:5]}...{api_key[-5:]}")
                 
                 for model_name in available_models:
                     try:
-                        print(f"DEBUG: Trying model '{model_name}'...")
+                        # print(f"DEBUG: Trying model '{model_name}'...")
                         test_model = genai.GenerativeModel(model_name)
                         # Quick ping to verify access
                         test_model.generate_content("Ping")
                         model_gemini = test_model
-                        print(f"DEBUG: Successfully connected to {model_name}")
+                        # print(f"DEBUG: Successfully connected to {model_name}")
                         break
                     except Exception as e:
-                        print(f"DEBUG: Failed to connect to {model_name}: {e}")
+                        pass # print(f"DEBUG: Failed to connect to {model_name}: {e}")
                 
                 if model_gemini is None:
                     st.error("Could not connect to any Gemini models. Check your API Key permissions.")

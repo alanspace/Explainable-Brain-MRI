@@ -6,6 +6,8 @@
 [![Gemini](https://img.shields.io/badge/AI-Gemini%201.5-blueviolet.svg)](https://deepmind.google/technologies/gemini/)
 
 > **Transparency in Neuro-Oncology**: A complete pipeline for classifying brain tumors (Glioma, Meningioma, Pituitary) that combines **Deep Learning Accuracy**, **Grad-CAM++ Visual Explanations**, and **Generative AI Clinical Reporting**.
+>
+> 🔗 **Live Demo**: [https://8q7jszzenm55fqes96kfw4.streamlit.app/](https://8q7jszzenm55fqes96kfw4.streamlit.app/)
 
 ---
 
@@ -43,6 +45,9 @@ We moved beyond subjective "looks good" metrics.
 ## 💻 Interactive Application
 
 The project includes a clinical dashboard for real-time inference.
+
+### Live Demo
+**[Click here to view the live app](https://8q7jszzenm55fqes96kfw4.streamlit.app/)**
 
 ### Running Locally
 ```bash
