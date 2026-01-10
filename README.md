@@ -1,177 +1,100 @@
-# Explainable Brain MRI: Industry-Standard Tumor Classification with XAI
+# Explainable Brain MRI: Clinical-Grade Tumor Classification with Visual XAI & LLM Verification
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Research%20Prototype-yellow.svg)]()
+[![Gemini](https://img.shields.io/badge/AI-Gemini%201.5-blueviolet.svg)](https://deepmind.google/technologies/gemini/)
 
-> A professional-grade Deep Learning pipeline for classifying brain tumors from MRI scans, featuring state-of-the-art Explainable AI (XAI) techniques to transparently visualize model decision-making.
-
----
-
-## 📖 Overview
-
-**Structural MRI (T1-weighted/FLAIR)** is the gold standard for non-invasive diagnosis of brain pathologies. However, "black box" deep learning models—despite high accuracy—often lack the transparency required for clinical adoption. 
-
-**Explainable Brain MRI** bridges this gap. It provides a robust machine learning framework for classifying brain tumors (Glioma, Meningioma, Pituitary) while generating intuitive **visual explanations** (Saliency Maps) that align with radiological findings. This project targets the intersection of **high-stakes medical diagnostics** and **AI transparency**, making it a key asset for industrial healthcare portfolios.
-
-### Key Objectives
-*   **Automated Triage**: Rapidly classify MRI scans into tumor subtypes or healthy tissue.
-*   **Clinical Trust**: Use **Grad-CAM** (Gradient-weighted Class Activation Mapping) to highlight suspicious regions (lesions) driving the prediction.
-*   **Reproducibility**: Modular, industry-ready codebase designed for scalability and easy integration with rigorous evaluation pipelines.
+> **Transparency in Neuro-Oncology**: A complete pipeline for classifying brain tumors (Glioma, Meningioma, Pituitary) that combines **Deep Learning Accuracy**, **Grad-CAM++ Visual Explanations**, and **Generative AI Clinical Reporting**.
 
 ---
 
-## 🧠 Medical Context & Methodology
+## 🚀 Key Innovations
 
-### Why Structural MRI?
-This project leverages **T1-weighted MRI**, known for its high contrast between grey matter, white matter, and CSF. This modality is ideal for anatomical parcellation and tumor segmentation.
-*   **T1-Weighted**: Excellent for boundary detection (Cortical/Subcortical structures).
-*   **Clinical Relevance**: The primary input for detecting space-occupying lesions like Gliomas and Meningiomas.
+### 1. 👁️ Smart-Masking XAI
+Unlike standard heatmaps that obscure the image, our **Grad-CAM++** implementation uses dynamic thresholding to highlight *only* the lesion while keeping the anatomy visible.
+*   **Method**: `cv2.threshold` > 30% intensity + Alpha Blending.
+*   **Result**: Clear visualization of tumor boundaries without "color fog."
 
-### The XAI Approach
-We move beyond simple accuracy metrics by integrating Explainable AI. As highlighted in recent literature (e.g., *Iftikhar et al., 2025*), trust in medical AI stems from "interpretable certainty".
-*   **Technique**: **Grad-CAM** (and future planned support for LIME/SHAP).
-*   **Output**: Heatmaps overlaid on the original MRI, indicating the pixel regions (e.g., tumor core, edible) that most influenced the CNN's classification.
-*   **Verification**: These heatmaps allow radiologists to verify if the model is looking at the *lesion* rather than confounding artifacts (e.g., skull markers).
+### 2. 🤖 AI Radiologist (Gemini 1.5 Integration)
+We simulate a dual-reader workflow by piping the MRI scan and ResNet prediction to **Google Gemini 1.5 Pro**.
+*   **Visual Verification**: The LLM independently analyzes the image features.
+*   **Hallucination Check**: If ResNet is wrong (e.g., predicting Tumor on a healthy scan), Gemini often flags the discrepancy.
+*   **Automated Reporting**: Generates a structured clinical draft (Findings, Impression) instantly.
 
----
-
-## 🛠️ Technical Architecture
-
-The system is built on a modular PyTorch architecture:
-
-1.  **Data Ingestion**: Custom pipelines for loading and transforming T1-weighted MRI images (Resize, Normalize, Augmentation).
-2.  **Backbone**: **ResNet18** (Pre-trained on ImageNet), fine-tuned for medical imaging. This offers a balance of feature extraction power and computational efficiency.
-3.  **XAI Engine**: A dedicated `GradCAM` module hooks into the final convolutional layers to extract gradients and generate class-specific activation maps.
+### 3. 💪 Quantitative Robustness
+We moved beyond subjective "looks good" metrics.
+*   **Faithfulness Score (0.37)**: Occlusion testing confirms the highlighted regions *cause* the prediction.
+*   **Stability Score (0.98)**: Explanations remain consistent even with Gaussian noise and rotation.
 
 ---
 
-## 📂 Project Structure
+## 🛠️ Tech Stack & Methodology
 
+| Component | Technology | Role |
+| :--- | :--- | :--- |
+| **Backbone** | **ResNet-18** | Feature Extraction (Pre-trained on ImageNet) |
+| **XAI Engine** | **Grad-CAM++** | High-fidelity localization of multiple lesion instances |
+| **LLM Agent** | **Gemini 1.5 Flash** | Second-opinion and report generation |
+| **Interface** | **Streamlit** | Interactive Clinical Dashboard |
+
+---
+
+## 💻 Interactive Application
+
+The project includes a clinical dashboard for real-time inference.
+
+### Running Locally
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Run the App
+streamlit run src/app.py
+```
+
+### 🔐 API Key Configuration (Optional)
+To use the Gemini features without pasting your key every time, create a secrets file:
+*   Create `.streamlit/secrets.toml`
+*   Add: `GOOGLE_API_KEY = "your_key_here"`
+*   *Note: This file is git-ignored for safety.*
+
+### 📂 Project Structure
 ```bash
 Explainable-Brain-MRI/
-├── data/                  # Dataset directory (Standard Kaggle Format)
+├── data/                  # Dataset directory
 ├── src/
-│   ├── dataset.py         # PyTorch Dataset & Dataloader implementation
-│   ├── model.py           # ResNet18 Backbone customization
-│   ├── train.py           # Training loop with validation & checkpointing
-│   └── gradcam.py         # XAI Engine (Grad-CAM implementation)
-├── notebooks/             # Jupyter notebooks for interactive analysis & visualization
-├── best_brain_tumor_model.pth  # Trained model weights
-├── requirements.txt       # Dependencies
+│   ├── app.py             # Streamlit Dashboard (+ Gemini Integration)
+│   ├── gradcam.py         # XAI Engine (Grad-CAM++)
+│   └── ...
+├── med-gemma/             # [Experimental] Local Med-LLM playground
+├── results/               # Generated Heatmaps
 └── README.md
 ```
 
----
-
-
-## 💻 Interactive Clinical Dashboard
-
-We provide a **Streamlit** web application for real-time model demonstration. This allows clinicians to upload raw MRI files and instantly view the AI's classification and saliency map.
-
-### Run the App
-```bash
-streamlit run src/app.py
-```
-> **Note**: Ensure `best_brain_tumor_model.pth` is present in the root directory.
 
 ---
 
-## 🚀 Getting Started
+## 📊 Evaluation Results
 
-### 1. Environment Setup
-Clone the repository and install dependencies:
-```bash
-git clone https://github.com/your-username/Explainable-Brain-MRI.git
-cd Explainable-Brain-MRI
-pip install -r requirements.txt
-```
-
-### 2. Dataset Preparation
-Download the [Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset) and structure it as follows:
-```
-data/
-├── Training/
-│   ├── glioma/
-│   ├── meningioma/
-│   ├── notumor/
-│   └── pituitary/
-└── Testing/
-    ├── ... (same classes)
-```
-
-### 3. Training
-Train the model with default hyperparameters:
-```bash
-python src/train.py --data_dir data/ --epochs 10 --batch_size 32
-```
-*   **Output**: Saves the best performing weights to `best_brain_tumor_model.pth`.
-
-### 4. Explainability Analysis
-Use the `notebooks/` or custom scripts to visualize model attention:
-
-```python
-from src.gradcam import GradCAM, overlay_heatmap
-# ... load model and image ...
-cam = GradCAM(model, target_layer=model.layer4[-1])
-heatmap, _ = cam.forward(input_tensor)
-visualization = overlay_heatmap(heatmap, original_image)
-```
-
----
-
-## � Visualization Results
-Here are examples of the model's visual explanations on the test set. The heatmap indicates the regions most relevant to the predicted class (Green label = Prediction).
-
+### Visual Explanations
 | **Glioma** | **Meningioma** | **No Tumor** |
 | :---: | :---: | :---: |
 | ![Glioma](results/glioma_explanation.png) | ![Meningioma](results/meningioma_explanation.png) | ![No Tumor](results/notumor_explanation.png) |
+*Note: The new Smart-Masking algorithm ensures the grey matter remains visible.*
 
-
-### 6. XAI Verification (Faithfulness Analysis)
-
-To verify that the model is truly looking at the pathology and not artifacts, we performed a quantitative **Occlusion Test**.
-*   **Method**: We mask the top 50% of the heatmap region and measure the drop in model confidence.
-*   **Hypothesis**: If the heatmap correctly highlights the tumor, blocking it should cause a massive drop in confidence.
-
-**Results (Average Confidence Drop):**
-*   **Overall Faithfulness Score**: **0.48** (Higher is better).
-*   **No Tumor**: 0.51 (Model relies heavily on specific texture/absence features).
-*   **Meningioma**: 0.32
-*   **Glioma**: 0.18
-
-> *Note*: "Pituitary" required more training epochs to converge for stable explanations in this rapid prototype.
-
-
-### 7. XAI Robustness Check (Grad-CAM++)
-To ensure explanations aren't brittle (sensitive to random noise), we tested stability using the advanced **Grad-CAM++** algorithm:
-*   **Gaussian Noise Stability**: **0.97** (Cosine Sim). The heatmap is functionally immune to standard MRI noise.
-*   **Rotation Stability**: **0.98**. The localization tracks the tumor almost perfectly during head tilt.
-
+### Quantitative Metrics
+*   **Accuracy**: ~85% (ResNet Baseline)
+*   **Faithfulness (Occlusion Drop)**: 0.37 avg
+*   **Noise Stability**: 0.97 (Cosine Similarity)
 
 ---
 
-## �🔬 Recent Research & Inspirations
-
-This project is grounded in the latest advancements in Medical XAI:
-
-*   **Iftikhar et al. (2025)**: Demonstrated 99% accuracy with CNNs + Grad-CAM/SHAP, highlighting the need for visual transparency in tumor detection.
-*   **Gharaibeh et al. (2025)**: Used Xception-based CNNs with Grad-CAM to align ML decisions with radiologist workflows.
-*   **Islam et al. (2025)**: Integrated Grad-CAM++ for improved localization of lesion boundaries.
-
-*Future work aims to implement quantitative XAI metrics (IoU with tumor masks) and explore perturbation-based methods (LIME).*
+## � References & Inspiration
+*   **Iftikhar et al. (2025)**: Importance of XAI in medical black-box models.
+*   **Islam et al. (2025)**: Grad-CAM++ for improved lesion localization.
 
 ---
 
-## 🤝 Contribution
-
-Contributions are welcome! Please focus on:
-1.  **Quantitative XAI Evaluation**: Metrics to measure heatmap overlap with ground-truth segmentation masks.
-2.  **Additional Models**: Support for DenseNet or Vision Transformers (ViT).
-3.  **LIME/SHAP Integration**: Adding perturbation-based explanation methods.
-
----
-
-**Author**: [Your Name/Team]
+**Author**: Shek Lun Leung (Quantum AI)
 **License**: MIT

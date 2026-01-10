@@ -63,7 +63,26 @@ To overcome the localization limitations of standard Grad-CAM, we implemented \t
 w_k^c = \sum_{i,j} \alpha_{ij}^{kc} \cdot \text{ReLU}\left(\frac{\partial Y^c}{\partial A_{ij}^k}\right)
 \end{equation}
 
-where $\alpha_{ij}^{kc}$ are closed-form coefficients derived from second- and third-order partial derivatives. This formulation allows the model to capture the full spatial extent of the tumor, rather than just the most discriminative part.
+where $\alpha_{ij}^{kc}$ are closed-form coefficients derived from second- and third-order partial derivatives.
+
+\subsubsection{Smart-Masking Visualization}
+Standard Grad-CAM heatmaps often occlude underlying anatomy. We implemented a dynamic thresholding mechanism (Equation \ref{eq:mask}) to render only high-confidence regions ($H_{ij} > \tau$):
+\begin{equation}
+\label{eq:mask}
+M_{ij} = \begin{cases} 
+      H_{ij} & \text{if } H_{ij} > 0.3 \\
+      0 & \text{otherwise}
+   \end{cases}
+\end{equation}
+This ensures that "cold" regions remain transparent, preserving radiological context.
+
+\subsection{Generative AI Verification Framework}
+To simulate a "dual-reader" clinical workflow, we integrated **Gemini 1.5 Pro**, a multimodal Large Language Model (LLM). The system pipes the original MRI scan and the ResNet prediction to the LLM, prompting it to:
+\begin{enumerate}
+    \item \textbf{Verify Visual Features}: Confirm if the lesion properties (margins, intensity) align with the predicted class.
+    \item \textbf{Identify Hallucinations}: Flag instances where the CNN predicts a tumor on a healthy scan.
+    \item \textbf{Draft Report}: Generate a structured findings section.
+\end{enumerate}
 
 \section{Experiments and Results}
 

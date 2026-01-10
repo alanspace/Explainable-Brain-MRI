@@ -69,12 +69,23 @@ Upload a T1-weighted MRI scan to classify the tumor type and visualize the regio
 
 # Setup
 device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
-MODEL_PATH = "best_brain_tumor_model.pth"
 CLASSES = ['glioma', 'meningioma', 'notumor', 'pituitary']
 
-# Load Model
-if not os.path.exists(MODEL_PATH):
-    st.error(f"Model file `{MODEL_PATH}` not found! Please run training first.")
+# Robust Model Path finding
+possible_paths = [
+    "best_brain_tumor_model.pth", 
+    "../best_brain_tumor_model.pth",
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "best_brain_tumor_model.pth")
+]
+
+MODEL_PATH = None
+for p in possible_paths:
+    if os.path.exists(p):
+        MODEL_PATH = p
+        break
+
+if MODEL_PATH is None:
+    st.error("Model file `best_brain_tumor_model.pth` not found in root or parent directory!")
     st.stop()
 
 model = load_trained_model(MODEL_PATH, device)
@@ -90,15 +101,21 @@ uploaded_file = st.file_uploader("Upload Patient MRI", type=["jpg", "png", "jpeg
 if uploaded_file is not None:
     # 1. Load and Preprocess
     image_pil = Image.open(uploaded_file)
+    print(f"DEBUG: Image loaded from {uploaded_file.name}. Size: {image_pil.size}")
+    
     original_img_np, input_tensor = preprocess_image(image_pil, device)
     
     # 2. Inference
+    print(f"DEBUG: Running inference on device: {device}")
     with torch.no_grad():
         output = model(input_tensor)
         probs = torch.softmax(output, dim=1).cpu().numpy()[0]
         pred_idx = torch.argmax(output, dim=1).item()
         pred_class = CLASSES[pred_idx]
         confidence = probs[pred_idx]
+        
+        print(f"DEBUG: Model Probabilities: {probs}")
+        print(f"DEBUG: Predicted: {pred_class} ({confidence:.2f})")
 
     # 3. Grad-CAM
     heatmap, _ = cam.forward(input_tensor, class_idx=pred_idx)
@@ -111,14 +128,14 @@ if uploaded_file is not None:
 
     with col1:
         st.subheader("Patient Scan")
-        st.image(original_img_np, caption="Original Input", use_column_width=True)
+        st.image(original_img_np, caption="Original Input", use_container_width=True)
 
     with col2:
         st.subheader("AI Explainability (Grad-CAM)")
         if visualization_mode == "Side-by-Side":
-             st.image(overlay, caption=f"Lesion Highlight ({pred_class})", use_column_width=True)
+             st.image(overlay, caption=f"Lesion Highlight ({pred_class})", use_container_width=True)
         else:
-             st.image(overlay, caption="Heatmap Overlay", use_column_width=True)
+             st.image(overlay, caption="Heatmap Overlay", use_container_width=True)
 
     st.markdown("---")
     
@@ -136,8 +153,69 @@ if uploaded_file is not None:
         else:
              st.metric(label=cls_name.title(), value=f"{prob*100:.1f}%")
              
+    st.markdown("---")
+
+    # 6. Gemini Integration
+    st.markdown("### 🤖 Radiologist Assistant (Gemini 1.5 Pro)")
+    st.info("Uses a Vision Language Model to verify the findings and draft a clinical report.")
+
+    # Try to load from secrets first, else ask user
+    if "GOOGLE_API_KEY" in st.secrets:
+        api_key = st.secrets["GOOGLE_API_KEY"]
+        st.success("API Key loaded from secrets.")
+    else:
+        api_key = st.sidebar.text_input("Gemini API Key", type="password", placeholder="Paste GOOGLE_API_KEY here")
+
+    if api_key:
+        import google.generativeai as genai
+        
+        if st.button("Generate Professional Report"):
+            try:
+                genai.configure(api_key=api_key)
+                # Use Gemini 2.0 Flash (Experimental) - Verified available
+                model_gemini = genai.GenerativeModel('gemini-2.0-flash-exp')
+                
+                print(f"DEBUG: API Key loaded: {api_key[:5]}...{api_key[-5:]}")
+                print(f"DEBUG: Using model: gemini-2.0-flash-exp")
+                
+                # Prompt Engineering for Medical Context
+                prompt = f"""
+                You are an expert Neuroradiologist assistant. 
+                You are provided with a T1-weighted MRI brain scan of a patient.
+                
+                An automated Deep Learning classifier has analyzed this image and predicted:
+                **Diagnosis**: {pred_class.upper()}
+                **Confidence**: {confidence*100:.1f}%
+
+                Please perform the following tasks professionally:
+                1. **Visual Verification**: Analyze the image. Do you see features consistent with a {pred_class}? Describe the lesion location, shape, and intensity if present.
+                2. **Critique**: Does the AI's confidence ({confidence*100:.1f}%) seem justified based on the visual evidence?
+                3. **Clinical Report**: Draft a concise, formal radiology report section for this scan. Use standard medical terminology (e.g., "hyperintense", "mass effect", "midline shift").
+
+                Note: If the image appears normal (No Tumor), describe the healthy anatomical structures.
+                """
+                with st.spinner("Consulting Gemini API..."):
+                    # Send PIL image and prompt
+                    print("DEBUG: Sending request to Gemini...")
+                    st.toast("Sending request to Gemini...", icon="🚀")
+                    response = model_gemini.generate_content([prompt, image_pil]) 
+                    print(f"DEBUG: Response received. Type: {type(response)}")
+                    if response.text:
+                        print("DEBUG: Response text length:", len(response.text))
+                        st.markdown(response.text)
+                    else:
+                        print("DEBUG: Empty response text!")
+                        st.error("Gemini returned an empty response. Please check the logs.")
+                    
+                    
+            except Exception as e:
+                st.error(f"Gemini Error: {e}")
+    else:
+        st.warning("⚠️ Enter your Gemini API Key in the sidebar to unlock the AI Radiologist.")
+
     # Disclaimer
-    st.warning("⚠️ **Disclaimer**: This tool is a research prototype. Do not use for definitive clinical diagnosis.")
+    st.markdown("---")
+    st.caption("⚠️ **Disclaimer**: This tool is a research prototype. Deep Learning & LLM outputs can hallucinate. Always consult a human doctor.")
 
 else:
     st.info("👆 Please upload an MRI image to begin analysis.")

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.11.25)  10 JAN 2026 22:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.11.25)  10 JAN 2026 23:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -444,33 +444,38 @@ Overfull \hbox (16.1711pt too wide) in paragraph at lines 60--61
  []
 
 
+LaTeX Warning: Reference `eq:mask' on page 2 undefined on input line 69.
+
+
 
 [2]
-<../results/glioma_explanation.png, id=81, 449.68pt x 224.84pt>
+<../results/glioma_explanation.png, id=87, 449.68pt x 224.84pt>
 File: ../results/glioma_explanation.png Graphic file (type png)
 <use ../results/glioma_explanation.png>
 Package pdftex.def Info: ../results/glioma_explanation.png  used on input line 
-102.
+121.
 (pdftex.def)             Requested size: 135.89174pt x 67.94655pt.
-<../results/meningioma_explanation.png, id=82, 449.68pt x 224.84pt>
+<../results/meningioma_explanation.png, id=88, 449.68pt x 224.84pt>
 File: ../results/meningioma_explanation.png Graphic file (type png)
 <use ../results/meningioma_explanation.png>
 Package pdftex.def Info: ../results/meningioma_explanation.png  used on input l
-ine 108.
+ine 127.
 (pdftex.def)             Requested size: 135.89174pt x 67.94655pt.
-<../results/notumor_explanation.png, id=83, 449.68pt x 224.84pt>
+<../results/notumor_explanation.png, id=89, 449.68pt x 224.84pt>
 File: ../results/notumor_explanation.png Graphic file (type png)
 <use ../results/notumor_explanation.png>
 Package pdftex.def Info: ../results/notumor_explanation.png  used on input line
- 114.
+ 133.
 (pdftex.def)             Requested size: 135.89174pt x 67.94655pt.
-
-No file paper.bbl.
 
 
 [3 <src/../results/glioma_explanation.png (PNG copy)> <src/../results/meningiom
 a_explanation.png (PNG copy)> <src/../results/notumor_explanation.png (PNG copy
-)>] (src/paper.aux)
+)>]
+No file paper.bbl.
+
+
+[4] (src/paper.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -479,14 +484,23 @@ L3 programming layer <2025-01-18>
 
 LaTeX Warning: There were undefined references.
 
-Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: CA2D09495E2056631E0E799165949417;2255.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `paper.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `paper.out':
+(rerunfilecheck)             Before: CA2D09495E2056631E0E799165949417;2255
+(rerunfilecheck)             After:  C4E8EB5EF7F84426F2D816154E66F6D8;2708.
  ) 
 Here is how much of TeX's memory you used:
- 11287 strings out of 474662
- 180770 string characters out of 5751108
+ 11297 strings out of 474662
+ 180900 string characters out of 5751108
  587862 words of memory out of 5000000
- 34187 multiletter control sequences out of 15000+600000
+ 34190 multiletter control sequences out of 15000+600000
  566723 words of font info for 63 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
  75i,11n,79p,1001b,530s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -503,10 +517,10 @@ texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025ba
 sic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/202
 5basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive
 /2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on src/paper.pdf (3 pages, 581020 bytes).
+Output written on src/paper.pdf (4 pages, 584217 bytes).
 PDF statistics:
- 154 PDF objects out of 1000 (max. 8388607)
- 121 compressed objects within 2 object streams
- 27 named destinations out of 1000 (max. 500000)
+ 165 PDF objects out of 1000 (max. 8388607)
+ 131 compressed objects within 2 object streams
+ 34 named destinations out of 1000 (max. 500000)
  120 words of extra memory for PDF output out of 10000 (max. 10000000)
 

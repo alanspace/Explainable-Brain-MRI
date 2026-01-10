@@ -8,3 +8,4 @@ pandas
 numpy
 tqdm
 streamlit
+google-generativeai

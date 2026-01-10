@@ -95,23 +95,37 @@ class GradCAM:
     @staticmethod
     def overlay_heatmap(heatmap, original_image, alpha=0.4, colormap=cv2.COLORMAP_JET):
         """
-        Overlays heatmap onto the original image.
+        Overlays heatmap onto the original image with smart masking.
         Args:
             heatmap: (H, W) float [0,1]
-            original_image: (H, W, 3) numpy array (uint8) or suitable float
+            original_image: (H, W, 3) numpy array (uint8)
         """
         # Resize heatmap to image size
         heatmap = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
+        
+        # Adaptive Thresholding
+        # If max activation is very low, we still want to show *where* it is looking, even if weak.
+        max_val = np.max(heatmap)
+        if max_val < 0.1:
+            # Low confidence case: Highlight top 20% of whatever signal exists
+            threshold = np.percentile(heatmap, 80)
+        else:
+            # Standard case: Highlight strong signals > 0.3
+            threshold = 0.3
+            
+        mask = heatmap > threshold
         
         # Convert to RGB colormap
         heatmap_uint8 = (255 * heatmap).astype(np.uint8)
         heatmap_colored = cv2.applyColorMap(heatmap_uint8, colormap)
         heatmap_colored = cv2.cvtColor(heatmap_colored, cv2.COLOR_BGR2RGB)
         
-        # Overlay
-        superimposed_img = heatmap_colored * alpha + original_image * (1 - alpha)
+        # Create output image
+        superimposed_img = original_image.copy()
         
-        # Normalize for display
-        superimposed_img = np.clip(superimposed_img, 0, 255).astype(np.uint8)
-        
-        return superimposed_img
+        # Blend
+        for c in range(3):
+            blended = alpha * heatmap_colored[:, :, c] + (1 - alpha) * original_image[:, :, c]
+            superimposed_img[:, :, c] = np.where(mask, blended, original_image[:, :, c])
+            
+        return superimposed_img.astype(np.uint8)
