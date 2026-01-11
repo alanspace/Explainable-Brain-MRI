@@ -36,6 +36,6 @@ data/
 # Mac
 .DS_Store
 .env
-.streamlit/secrets.toml
+**/.streamlit/secrets.toml
 **/*.pyc
 __pycache__/

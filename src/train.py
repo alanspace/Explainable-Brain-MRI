@@ -11,19 +11,25 @@ from albumentations.pytorch import ToTensorV2
 from dataset import BrainTumorDataset
 from model import get_model
 
+BRAIN_MEAN = [0.1854, 0.1854, 0.1855]
+BRAIN_STD = [0.1855, 0.1855, 0.1855]
+
 def get_transforms(phase='train'):
     if phase == 'train':
         return A.Compose([
             A.Resize(224, 224),
             A.HorizontalFlip(p=0.5),
-            A.Rotate(limit=15, p=0.5),
-            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.299, 0.224, 0.225]),
+            A.VerticalFlip(p=0.2),
+            A.Rotate(limit=30, p=0.5),
+            A.RandomBrightnessContrast(p=0.2),
+            A.ElasticTransform(alpha=1, sigma=50, alpha_affine=50, p=0.2),
+            A.Normalize(mean=BRAIN_MEAN, std=BRAIN_STD),
             ToTensorV2()
         ])
     else:
         return A.Compose([
             A.Resize(224, 224),
-            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.299, 0.224, 0.225]),
+            A.Normalize(mean=BRAIN_MEAN, std=BRAIN_STD),
             ToTensorV2()
         ])
 
@@ -99,12 +105,19 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2)
     
     # 2. Model
-    model = get_model(num_classes=4, pretrained=True)
+    model = get_model(model_name=args.model_name, num_classes=4, pretrained=True)
     model = model.to(device)
     
     # 3. Optimization
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr) # Only training head initially if frozen
+    # Calculate class weights for imbalance
+    class_counts = [1321, 1339, 1595, 1457] # glioma, meningioma, notumor, pituitary
+    total_samples = sum(class_counts)
+    class_weights = [total_samples / (len(class_counts) * x) for x in class_counts]
+    weights_tensor = torch.tensor(class_weights, dtype=torch.float).to(device)
+    
+    criterion = nn.CrossEntropyLoss(weight=weights_tensor)
+    optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4) # AdamW often better
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
     
     # 4. Training Loop
     best_acc = 0.0
@@ -114,8 +127,11 @@ def main(args):
         train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device)
         val_loss, val_acc = eval_epoch(model, val_loader, criterion, device)
         
+        scheduler.step()
+        
         print(f"Train Loss: {train_loss:.4f} Acc: {train_acc:.4f}")
         print(f"Val Loss: {val_loss:.4f} Acc: {val_acc:.4f}")
+        print(f"Current LR: {scheduler.get_last_lr()[0]:.6f}")
         
         if val_acc > best_acc:
             best_acc = val_acc
@@ -126,10 +142,11 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_dir', type=str, required=True, help='Path to dataset root (containing Training/Testing subdirs or class folders)')
-    parser.add_argument('--epochs', type=int, default=10)
+    parser.add_argument('--data_dir', type=str, required=True, help='Path to dataset root')
+    parser.add_argument('--model_name', type=str, default='efficientnet_b0', help='Model architecture')
+    parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--lr', type=float, default=1e-4)
     args = parser.parse_args()
     
     main(args)

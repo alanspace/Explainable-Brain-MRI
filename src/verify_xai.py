@@ -13,9 +13,12 @@ def load_image(path):
     img = cv2.resize(img, (224, 224))
     return img
 
+BRAIN_MEAN = [0.1854, 0.1854, 0.1855]
+BRAIN_STD = [0.1855, 0.1855, 0.1855]
+
 def preprocess(img, device):
     img_tensor = img.astype(np.float32) / 255.0
-    img_tensor = (img_tensor - [0.485, 0.456, 0.406]) / [0.229, 0.224, 0.225]
+    img_tensor = (img_tensor - BRAIN_MEAN) / BRAIN_STD
     img_tensor = np.transpose(img_tensor, (2, 0, 1))
     img_tensor = torch.tensor(img_tensor).unsqueeze(0).float().to(device)
     return img_tensor
@@ -44,13 +47,13 @@ def main():
     print(f"Using Device for XAI Verification: {device}")
     
     # Load Model
-    model = get_model(num_classes=4, pretrained=False)
+    model = get_model(model_name='efficientnet_b0', num_classes=4, pretrained=False)
     model.load_state_dict(torch.load("best_brain_tumor_model.pth", map_location=device))
     model.to(device)
     model.eval()
     
     # Grad-CAM
-    target_layer = model.layer4[-1]
+    target_layer = model.features[-1]
     cam = GradCAM(model, target_layer)
     
     classes = ['glioma', 'meningioma', 'notumor', 'pituitary']

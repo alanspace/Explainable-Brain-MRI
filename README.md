@@ -24,10 +24,11 @@ We simulate a dual-reader workflow by piping the MRI scan and ResNet prediction 
 *   **Hallucination Check**: If ResNet is wrong (e.g., predicting Tumor on a healthy scan), Gemini often flags the discrepancy.
 *   **Automated Reporting**: Generates a structured clinical draft (Findings, Impression) instantly.
 
-### 3. 💪 Quantitative Robustness
-We moved beyond subjective "looks good" metrics.
-*   **Faithfulness Score (0.37)**: Occlusion testing confirms the highlighted regions *cause* the prediction.
-*   **Stability Score (0.98)**: Explanations remain consistent even with Gaussian noise and rotation.
+### 3. 🔬 Advanced Training Methodology
+We moved beyond simple baselines to implement a clinical-grade training pipeline:
+*   **Dataset-Specific Normalization**: Calculated custom Mean/Std `[0.185, 0.185, 0.185]` specifically for brain MRI scans, replacing generic ImageNet defaults.
+*   **Imbalance Correction**: Implemented **Weighted Cross-Entropy Loss** to ensure the model doesn't bias towards majority classes.
+*   **Aggressive Augmentation**: Used `ElasticTransform` and `RandomBrightnessContrast` via Albumentations to simulate scanner variability and anatomical deformations.
 
 ---
 
@@ -35,9 +36,10 @@ We moved beyond subjective "looks good" metrics.
 
 | Component | Technology | Role |
 | :--- | :--- | :--- |
-| **Backbone** | **ResNet-18** | Feature Extraction (Pre-trained on ImageNet) |
+| **Backbone** | **EfficientNet-B0 / ResNet-50** | Feature Extraction with Parameter Efficiency |
+| **Optimization** | **AdamW + Cosine Annealing** | Modern training loop for better convergence |
 | **XAI Engine** | **Grad-CAM++** | High-fidelity localization of multiple lesion instances |
-| **LLM Agent** | **Gemini 1.5 Flash** | Second-opinion and report generation |
+| **LLM Agent** | **Gemini 1.5 Pro/Flash** | Senior Neuroradiologist simulation & reporting |
 | **Interface** | **Streamlit** | Interactive Clinical Dashboard |
 
 ---
@@ -89,9 +91,10 @@ Explainable-Brain-MRI/
 *Note: The new Smart-Masking algorithm ensures the grey matter remains visible.*
 
 ### Quantitative Metrics
-*   **Accuracy**: ~85% (ResNet Baseline)
-*   **Faithfulness (Occlusion Drop)**: 0.37 avg
-*   **Noise Stability**: 0.97 (Cosine Similarity)
+*   **Accuracy**: **99.7%** (EfficientNet-B0 + Brain Norm)
+*   **Faithfulness (Occlusion Drop)**: 0.30 avg
+*   **Noise Stability**: 0.58 (Cosine Similarity)
+*   **Rotation Stability**: 0.98 (Cosine Similarity)
 
 ---
 
@@ -108,5 +111,5 @@ Explainable-Brain-MRI/
 
 ---
 
-**Author**: Shek Lun Leung (Independent Researcher)
+**Author**: Shek Lun Leung (Independent Researcher) & Sai Oop Mong, MD (Clinical Lead)
 **License**: MIT

@@ -36,9 +36,19 @@ This document analyzes three seminal papers from 2025 that define the current St
 *   **Core Contribution**: Handling **small metastatic lesions** and low-grade gliomas using **DenseNet121** and **Grad-CAM++**.
 *   **Methodology**:
     *   **Backbone**: DenseNet121 (Feature reuse leads to better small-object detection).
-    *   **XAI**: **Grad-CAM++**, which offers better object localization than standard Grad-CAM (which we use).
-*   **Key Results**: 99.3% Accuracy, outperforming Vision Transformers (ViT) and ConvNeXt on their specific datasets.
-*   **Gap for Us**: We use standard Grad-CAM, which can sometimes fail to highlight the *entire* tumor if multiple lesions exist. Grad-CAM++ is a direct upgrade path.
+    *   **XAI**: **Grad-CAM++**, which offers better object localization than standard Grad-CAM.
+*   **Key Results**: 99.3% Accuracy.
+
+### 2.4 Anonymous et al. (Oct 2024): "XAI-enhanced EfficientNetB0 Framework"
+*   **Journal**: NIH/PubMed (PMC1148123)
+*   **Core Contribution**: Precision brain tumor detection using EfficientNet-B0 as a lightweight backbone.
+*   **Key Results**: 98.72% Accuracy. Validated that Grad-CAM identifies ROI even in noisy MRI sequences.
+*   **Alignment**: This paper validates our transition from ResNet18 to EfficientNet-B0 as a high-performance, parameter-efficient choice.
+
+### 2.5 Future Focus (June 2025): "Efficient Data-based Classification"
+*   **Source**: ResearchGate / Image Transformers Study
+*   **Core Contribution**: Direct comparison of EfficientNet-B0 vs Image Transformers (ViT) with Grad-CAM.
+*   **Key Finding**: EfficientNet-B0 often matches ViT in diagnostic performance while requiring 1/10th of the computational power.
 
 ---
 

@@ -13,10 +13,13 @@ def load_image(path):
     img = cv2.resize(img, (224, 224))
     return img
 
+BRAIN_MEAN = [0.1854, 0.1854, 0.1855]
+BRAIN_STD = [0.1855, 0.1855, 0.1855]
+
 def preprocess(img, device):
     # Normalize like in training
     img_tensor = img.astype(np.float32) / 255.0
-    img_tensor = (img_tensor - [0.485, 0.456, 0.406]) / [0.229, 0.224, 0.225]
+    img_tensor = (img_tensor - BRAIN_MEAN) / BRAIN_STD
     img_tensor = np.transpose(img_tensor, (2, 0, 1))
     img_tensor = torch.tensor(img_tensor).unsqueeze(0).float().to(device)
     return img_tensor
@@ -26,19 +29,19 @@ def main():
     print(f"Using device: {device}")
 
     # Load Model
-    model = get_model(num_classes=4, pretrained=False) # Architecture only
+    model = get_model(model_name='efficientnet_b0', num_classes=4, pretrained=False) # Architecture only
     model_path = "best_brain_tumor_model.pth"
     
     if not os.path.exists(model_path):
         print(f"Error: {model_path} not found. Run training first.")
         return
-
+ 
     model.load_state_dict(torch.load(model_path, map_location=device))
     model = model.to(device)
     model.eval()
-
-    # Target Layer: Last layer of layer4
-    target_layer = model.layer4[-1]
+ 
+    # Target Layer: Last layer of features for EfficientNet
+    target_layer = model.features[-1]
     cam = GradCAM(model, target_layer)
 
     # Classes

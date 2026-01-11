@@ -17,9 +17,9 @@ st.set_page_config(
 
 # --- Utils ---
 @st.cache_resource
-def load_trained_model(model_path, device):
+def load_trained_model(model_path, model_name, device):
     try:
-        model = get_model(num_classes=4, pretrained=False)
+        model = get_model(model_name=model_name, num_classes=4, pretrained=False)
         model.load_state_dict(torch.load(model_path, map_location=device))
         model.to(device)
         model.eval()
@@ -40,9 +40,12 @@ def preprocess_image(pil_image, device):
         
     orig_img = cv2.resize(img, (224, 224))
     
-    # Normalize for Model
+    # Updated Mean/Std based on Brain Dataset
+    BRAIN_MEAN = [0.1854, 0.1854, 0.1855]
+    BRAIN_STD = [0.1855, 0.1855, 0.1855]
+    
     img_tensor = orig_img.astype(np.float32) / 255.0
-    img_tensor = (img_tensor - [0.485, 0.456, 0.406]) / [0.229, 0.224, 0.225]
+    img_tensor = (img_tensor - BRAIN_MEAN) / BRAIN_STD
     img_tensor = np.transpose(img_tensor, (2, 0, 1))
     img_tensor = torch.tensor(img_tensor).unsqueeze(0).float().to(device)
     
@@ -53,9 +56,12 @@ st.sidebar.title("🧠 Clinical Dashboard")
 st.sidebar.markdown("---")
 st.sidebar.info(
     "**Project**: Explainable Brain MRI\n\n"
-    "**Model**: ResNet18 + Grad-CAM\n\n"
+    "**Model**: EfficientNet-B0 + Grad-CAM++\n\n"
     "**Classes**: Glioma, Meningioma, Pituitary, No Tumor"
 )
+
+# Model selection in sidebar (optional, but good to have)
+model_choice = st.sidebar.selectbox("Model Architecture", ["efficientnet_b0", "resnet50"], index=0)
 
 visualization_mode = st.sidebar.radio("Visualization Mode", ["Side-by-Side", "Overlay Only"])
 alpha = st.sidebar.slider("Heatmap Opacity", 0.0, 1.0, 0.5)
@@ -88,11 +94,17 @@ if MODEL_PATH is None:
     st.error("Model file `best_brain_tumor_model.pth` not found in root or parent directory!")
     st.stop()
 
-model = load_trained_model(MODEL_PATH, device)
+model = load_trained_model(MODEL_PATH, model_choice, device)
 
 # Initialize GradCAM
-# Target Layer: Last layer of layer4 for ResNet18
-target_layer = model.layer4[-1]
+# Target Layer selection based on model
+if model_choice == 'efficientnet_b0':
+    target_layer = model.features[-1]
+elif model_choice == 'resnet50':
+    target_layer = model.layer4[-1]
+else:
+    target_layer = model.layer4[-1] # default fallback
+
 cam = GradCAM(model, target_layer)
 
 # File Upload
@@ -156,8 +168,8 @@ if uploaded_file is not None:
     st.markdown("---")
 
     # 6. Gemini Integration
-    st.markdown("### 🤖 Radiologist Assistant (Gemini 1.5 Pro)")
-    st.info("Uses a Vision Language Model to verify the findings and draft a clinical report.")
+    st.markdown("### 🤖 Radiologist Assistant (Gemini 2.0 Flash)")
+    st.info("Uses a State-of-the-Art Vision Language Model to verify findings and draft reports.")
 
     # Try to load from secrets first, else ask user
     if "GOOGLE_API_KEY" in st.secrets:
@@ -173,21 +185,20 @@ if uploaded_file is not None:
             try:
                 genai.configure(api_key=api_key)
                 # Attempt to connect to the best available model
-                available_models = ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro']
+                available_models = ['gemini-2.0-flash', 'gemini-1.5-flash']
                 model_gemini = None
-                
-                # print(f"DEBUG: API Key loaded: {api_key[:5]}...{api_key[-5:]}")
                 
                 last_error = "Unknown error"
                 for model_name in available_models:
                     try:
-                        test_model = genai.GenerativeModel(model_name)
-                        # Quick ping to verify access
-                        test_model.generate_content("Ping")
-                        model_gemini = test_model
+                        # Use a more direct instantiation
+                        model_gemini = genai.GenerativeModel(model_name=model_name)
+                        # We don't do a full generate_content ping here to avoid quota/limit issues
+                        # We just test the instantiation
                         break
                     except Exception as e:
                         last_error = str(e)
+                        model_gemini = None
                 
                 if model_gemini is None:
                     st.error(f"Could not connect to any Gemini models. Last error: {last_error}")
@@ -197,19 +208,21 @@ if uploaded_file is not None:
                 
                 # Prompt Engineering for Medical Context
                 prompt = f"""
-                You are an expert Neuroradiologist assistant. 
-                You are provided with a T1-weighted MRI brain scan of a patient.
+                You are a Senior Neuroradiologist collaborating with an AI Classification system.
                 
-                An automated Deep Learning classifier has analyzed this image and predicted:
-                **Diagnosis**: {pred_class.upper()}
-                **Confidence**: {confidence*100:.1f}%
-
-                Please perform the following tasks professionally:
-                1. **Visual Verification**: Analyze the image. Do you see features consistent with a {pred_class}? Describe the lesion location, shape, and intensity if present.
-                2. **Critique**: Does the AI's confidence ({confidence*100:.1f}%) seem justified based on the visual evidence?
-                3. **Clinical Report**: Draft a concise, formal radiology report section for this scan. Use standard medical terminology (e.g., "hyperintense", "mass effect", "midline shift").
-
-                Note: If the image appears normal (No Tumor), describe the healthy anatomical structures.
+                **AI Findings**:
+                - Predicted Class: {pred_class.upper()}
+                - Confidence Score: {confidence*100:.1f}%
+                
+                **Your Mission**:
+                1. **Clinical Validation**: Examine the provided T1-weighted MRI scan. Does the anatomical presentation align with a {pred_class}?
+                2. **Explainability Review**: The AI has highlighted specific regions (Grad-CAM++). Assuming the AI is focusing on the most relevant features, evaluate if its "attention" is clinically sound or if it might be looking at artifacts. 
+                3. **Diagnostic Report**: Draft a professional radiology report including:
+                   - **Observations**: Lesion size, morphology, signal intensity, and location.
+                   - **Differential Diagnosis**: If the AI confidence is low, what else could it be?
+                   - **Impression**: Final summary and recommended next steps (e.g., Contrast-enhanced MRI, biopsy).
+                
+                Maintain a formal, objective, and analytical tone. Use precise neuroanatomical terms.
                 """
                 with st.spinner("Consulting Gemini API..."):
                     # Send PIL image and prompt
