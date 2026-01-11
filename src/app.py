@@ -9,7 +9,7 @@ from gradcam import GradCAM
 
 # Page Config
 st.set_page_config(
-    page_title="Explainable Brain MRI",
+    page_title="LucidMed AI",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -52,11 +52,21 @@ def preprocess_image(pil_image, device):
     return orig_img, img_tensor
 
 # --- Sidebar ---
-st.sidebar.title("🧠 Clinical Dashboard")
+st.sidebar.title("🩺 LucidMed AI")
+st.sidebar.caption("Intelligent Radiology Assistant")
 st.sidebar.markdown("---")
+
+# Roadmap / Multi-organ support (Placeholder)
+st.sidebar.selectbox(
+    "Organ System", 
+    ["Brain MRI (v1.0)", "Chest X-Ray (Coming Soon)", "Retinal Fundus (Coming Soon)"],
+    index=0,
+    disabled=True,
+    help="Multi-organ support is currently in development."
+)
+
 st.sidebar.info(
-    "**Project**: Explainable Brain MRI\n\n"
-    "**Model**: EfficientNet-B0 + Grad-CAM++\n\n"
+    "**Core Model**: EfficientNet-B0 + Grad-CAM++\n\n"
     "**Classes**: Glioma, Meningioma, Pituitary, No Tumor"
 )
 
@@ -67,7 +77,8 @@ visualization_mode = st.sidebar.radio("Visualization Mode", ["Side-by-Side", "Ov
 alpha = st.sidebar.slider("Heatmap Opacity", 0.0, 1.0, 0.5)
 
 # --- Main Page ---
-st.title("Explainable Brain Tumor Classification")
+# --- Main Page ---
+st.title("LucidMed AI: Intelligent Radiology Assistant")
 st.markdown("""
 This tool uses **Deep Learning** and **XAI** to assist radiologists. 
 Upload a T1-weighted MRI scan to classify the tumor type and visualize the regions driving the diagnosis.
@@ -168,15 +179,23 @@ if uploaded_file is not None:
     st.markdown("---")
 
     # 6. Gemini Integration
-    st.markdown("### 🤖 Radiologist Assistant (Gemini 2.0 Flash)")
-    st.info("Uses a State-of-the-Art Vision Language Model to verify findings and draft reports.")
+    st.markdown("### 🤖 Radiologist Assistant")
+    st.markdown("We use **Gemini 2.0 Flash** by default for its speed and efficiency.")
+    
+    st.info("💡 **Suggestion**: If you need deeper clinical reasoning or have high-volume needs, you can provide your own API Key in the sidebar. This allows you to tap into higher rate limits or switch to models like **Gemini 1.5 Pro** if supported.")
 
     # Try to load from secrets first, else ask user
-    if "GOOGLE_API_KEY" in st.secrets:
+    # API Key Handling
+    user_api_key = st.sidebar.text_input("Gemini API Key (Optional)", type="password", help="Enter your own key to override the default.", placeholder="Paste GOOGLE_API_KEY")
+    
+    if user_api_key:
+        api_key = user_api_key
+        st.sidebar.success("Using Custom API Key")
+    elif "GOOGLE_API_KEY" in st.secrets:
         api_key = st.secrets["GOOGLE_API_KEY"]
-        st.success("API Key loaded from secrets.")
+        # st.sidebar.info("Using Default API Key") 
     else:
-        api_key = st.sidebar.text_input("Gemini API Key", type="password", placeholder="Paste GOOGLE_API_KEY here")
+        api_key = None
 
     if api_key:
         import google.generativeai as genai
@@ -208,7 +227,8 @@ if uploaded_file is not None:
                 
                 # Prompt Engineering for Medical Context
                 prompt = f"""
-                You are a Senior Neuroradiologist collaborating with an AI Classification system.
+                You are **Dr. Lucid**, a Senior Consultant Neuroradiologist at LucidMed AI.
+                You are collaborating with an AI Classification system to validate findings.
                 
                 **AI Findings**:
                 - Predicted Class: {pred_class.upper()}

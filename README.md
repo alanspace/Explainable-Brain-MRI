@@ -1,11 +1,12 @@
-# Explainable Brain MRI: Clinical-Grade Tumor Classification with Visual XAI & LLM Verification
+# LucidMed AI: Intelligent Radiology Assistant
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Gemini](https://img.shields.io/badge/AI-Gemini%201.5-blueviolet.svg)](https://deepmind.google/technologies/gemini/)
+[![Gemini](https://img.shields.io/badge/AI-Gemini%202.0%20Flash-blueviolet.svg)](https://deepmind.google/technologies/gemini/)
+[![Paper](https://img.shields.io/badge/Paper-Read%20PDF-red)](Explainable_Brain_MRI_Paper.pdf)
 
-> **Transparency in Neuro-Oncology**: A complete pipeline for classifying brain tumors (Glioma, Meningioma, Pituitary) that combines **Deep Learning Accuracy**, **Grad-CAM++ Visual Explanations**, and **Generative AI Clinical Reporting**.
+> **LucidMed AI**: A transparent, clinical-grade platform for classifying brain tumors (Glioma, Meningioma, Pituitary) that combines **Deep Learning Accuracy**, **Grad-CAM++ Visual Explanations**, and **Generative AI Clinical Reporting**.
 >
 > 🔗 **Live Demo**: [https://8q7jszzenm55fqes96kfw4.streamlit.app/](https://8q7jszzenm55fqes96kfw4.streamlit.app/)
 
@@ -18,10 +19,10 @@ Unlike standard heatmaps that obscure the image, our **Grad-CAM++** implementati
 *   **Method**: `cv2.threshold` > 30% intensity + Alpha Blending.
 *   **Result**: Clear visualization of tumor boundaries without "color fog."
 
-### 2. 🤖 AI Radiologist (Gemini 1.5 Integration)
-We simulate a dual-reader workflow by piping the MRI scan and ResNet prediction to **Google Gemini 1.5 Pro**.
+### 2. 🤖 AI Radiologist (Gemini 2.0 Flash Integration)
+We simulate a dual-reader workflow by piping the MRI scan and EfficientNet prediction to **Google Gemini 2.0 Flash**.
 *   **Visual Verification**: The LLM independently analyzes the image features.
-*   **Hallucination Check**: If ResNet is wrong (e.g., predicting Tumor on a healthy scan), Gemini often flags the discrepancy.
+*   **Hallucination Check**: If EfficientNet is wrong (e.g., predicting Tumor on a healthy scan), Gemini often flags the discrepancy.
 *   **Automated Reporting**: Generates a structured clinical draft (Findings, Impression) instantly.
 
 ### 3. 🔬 Advanced Training Methodology
@@ -36,10 +37,10 @@ We moved beyond simple baselines to implement a clinical-grade training pipeline
 
 | Component | Technology | Role |
 | :--- | :--- | :--- |
-| **Backbone** | **EfficientNet-B0 / ResNet-50** | Feature Extraction with Parameter Efficiency |
+| **Backbone** | **EfficientNet-B0** | Feature Extraction with Parameter Efficiency |
 | **Optimization** | **AdamW + Cosine Annealing** | Modern training loop for better convergence |
 | **XAI Engine** | **Grad-CAM++** | High-fidelity localization of multiple lesion instances |
-| **LLM Agent** | **Gemini 1.5 Pro/Flash** | Senior Neuroradiologist simulation & reporting |
+| **LLM Agent** | **Gemini 2.0 Flash** | Senior Neuroradiologist simulation & reporting |
 | **Interface** | **Streamlit** | Interactive Clinical Dashboard |
 
 ---
@@ -85,9 +86,9 @@ Explainable-Brain-MRI/
 ## 📊 Evaluation Results
 
 ### Visual Explanations
-| **Glioma** | **Meningioma** | **No Tumor** |
-| :---: | :---: | :---: |
-| ![Glioma](results/glioma_explanation.png) | ![Meningioma](results/meningioma_explanation.png) | ![No Tumor](results/notumor_explanation.png) |
+| **Glioma** | **Meningioma** | **Pituitary** | **No Tumor** |
+| :---: | :---: | :---: | :---: |
+| ![Glioma](results/glioma_explanation.png) | ![Meningioma](results/meningioma_explanation.png) | ![Pituitary](results/pituitary_explanation.png) | ![No Tumor](results/notumor_explanation.png) |
 *Note: The new Smart-Masking algorithm ensures the grey matter remains visible.*
 
 ### Quantitative Metrics
@@ -99,7 +100,7 @@ Explainable-Brain-MRI/
 ---
 
 ## 🚨 Limitations & Safety
-*   **Single-Slice 2D Analysis**: The current ResNet18 model looks at a single 2D slice. Tumors that are clear in 3D volume but subtle in one axial slice may be missed. This is why we created the **Dual-Verification System**.
+*   **Single-Slice 2D Analysis**: The current EfficientNet-B0 model looks at a single 2D slice. Tumors that are clear in 3D volume but subtle in one axial slice may be missed. This is why we created the **Dual-Verification System**.
 *   **Contrast Media**: Our model is trained on T1-weighted images. Some tumors (e.g., small meningiomas) are isointense to brain tissue and only become visible with Gadolinium contrast, which this dataset does not consistently distinguish.
 
 ---
