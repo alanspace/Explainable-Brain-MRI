@@ -178,20 +178,20 @@ if uploaded_file is not None:
                 
                 # print(f"DEBUG: API Key loaded: {api_key[:5]}...{api_key[-5:]}")
                 
+                last_error = "Unknown error"
                 for model_name in available_models:
                     try:
-                        # print(f"DEBUG: Trying model '{model_name}'...")
                         test_model = genai.GenerativeModel(model_name)
                         # Quick ping to verify access
                         test_model.generate_content("Ping")
                         model_gemini = test_model
-                        # print(f"DEBUG: Successfully connected to {model_name}")
                         break
                     except Exception as e:
-                        pass # print(f"DEBUG: Failed to connect to {model_name}: {e}")
+                        last_error = str(e)
                 
                 if model_gemini is None:
-                    st.error("Could not connect to any Gemini models. Check your API Key permissions.")
+                    st.error(f"Could not connect to any Gemini models. Last error: {last_error}")
+                    st.info("Ensure your API Key is correct and has 'Generative Language API' enabled in Google AI Studio.")
                     st.stop()
 
                 
