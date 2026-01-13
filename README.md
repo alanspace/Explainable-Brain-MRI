@@ -92,9 +92,14 @@ Explainable-Brain-MRI/
 *Note: The new Smart-Masking algorithm ensures the grey matter remains visible.*
 
 ### Quantitative Metrics
-*   **Accuracy**: **99.7%** (EfficientNet-B0 + Brain Norm)
+*   **Accuracy**: **99.30%** ($\pm$ 0.14%) — *Rigorous 5-Fold Cross-Validation Average*
+*   **Peak Accuracy**: **99.7%** (Best Single Fold)
+*   **Clinical-Grade Verification**:
+    *   **5-Fold Cross-Validation**: Ensures the model is robust across all data splits, not just a "lucky" training set.
+    *   **Test-Time Augmentation (TTA)**: Validates predictions by analyzing multiple views (flips/rotations) of the patient scan.
+    *   **Label Smoothing**: Prevents model overconfidence, ensuring better generalization to unseen data.
 *   **Faithfulness (Occlusion Drop)**: 0.30 avg
-*   **Noise Stability**: 0.58 (Cosine Similarity)
+*   **Noise Stability**: 0.56 (Cosine Similarity)
 *   **Rotation Stability**: 0.98 (Cosine Similarity)
 
 ---

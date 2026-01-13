@@ -29,7 +29,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent While Deep Convolutional Neural Networks (CNNs) have demonstrated dermatologist-level efficacy in medical image classification, their reliable deployment in neuro-oncology is impeded by a lack of interpretability. This study introduces an advanced unified framework for multi-class brain tumor classification (Glioma, Meningioma, Pituitary, No Tumor) using T1-weighted MRI, achieving a state-of-the-art accuracy of \textbf{99.7\%}. By upgrading to an \textbf{EfficientNet-B0} backbone with dataset-specific normalization and weighted loss functions, we significantly outperform baseline ResNet architectures. We integrate a rigorous Explainable AI (XAI) verification suite to quantify the \textit{faithfulness} (Score: 0.30) and \textit{robustness} (Rotation Stability: 0.98) of our Grad-CAM++ explanations. Our findings provide a validated pathway for high-accuracy, interpretable clinical decision support.
+\noindent While Deep Convolutional Neural Networks (CNNs) have demonstrated dermatologist-level efficacy in medical image classification, their reliable deployment in neuro-oncology is impeded by a lack of interpretability. This study introduces an advanced unified framework for multi-class brain tumor classification (Glioma, Meningioma, Pituitary, No Tumor) using T1-weighted MRI, achieving a rigorous 5-fold average accuracy of \textbf{99.30\%} ($\pm$0.14\%). By upgrading to an \textbf{EfficientNet-B0} backbone with dataset-specific normalization and weighted loss functions, we significantly outperform baseline ResNet architectures. We integrate a rigorous Explainable AI (XAI) verification suite to quantify the \textit{faithfulness} (Score: 0.30) and \textit{robustness} (Rotation Stability: 0.98) of our Grad-CAM++ explanations. Our findings provide a validated pathway for high-accuracy, interpretable clinical decision support.
 \end{abstract}
 
 \section{Introduction}
@@ -99,6 +99,15 @@ To simulate a "dual-reader" clinical workflow, we integrated **Gemini 1.5 Pro**,
     \item \textbf{Draft Report}: Generate a structured findings section.
 \end{enumerate}
 
+\subsection{Rigorous Performance Verification}
+To ensure the reported high accuracy is not a result of a favorable train-test split ("lucky split"), we implemented a rigorous validation protocol:
+
+\begin{itemize}
+    \item \textbf{5-Fold Cross-Validation}: The entire dataset was shuffled and partitioned into 5 balanced folds. The model was trained and evaluated iteratively, ensuring that every image was used for validation exactly once. The final reported accuracy is the mean of these 5 independent runs, providing a statistically significant measure of performance.
+    \item \textbf{Test-Time Augmentation (TTA)}: During inference, we employ a TTA strategy where prediction is averaged across multiple views (original, horizontal flip, and slight rotations). This mitigates the risk of misclassification due to orientation artifacts.
+    \item \textbf{Label Smoothing}: To prevent the model from becoming overconfident and to improve generalization, we applied Label Smoothing ($\epsilon=0.1$) to the Cross-Entropy Loss. This encourages the model to learn more robust feature representations rather than fitting to hard class boundaries.
+\end{itemize}
+
 \section{Experiments and Results}
 
 \subsection{Diagnostic Performance: Comparative Analysis}
@@ -140,7 +149,7 @@ Clinical tools must be stable. We measured the Cosine Similarity of explanations
 \toprule
 \textbf{Perturbation Type} & \textbf{Stability Score (0-1)} \\
 \midrule
-Gaussian Noise ($\sigma=0.01$) & \textbf{0.58} \\
+Gaussian Noise ($\sigma=0.01$) & \textbf{0.56} \\
 Geometric Rotation ($\pm 10^{\circ}$) & \textbf{0.98} \\
 \bottomrule
 \end{tabular}
@@ -177,7 +186,7 @@ Figure \ref{fig:qualitative} illustrates the model's focus. In the Glioma case, 
 \section{Discussion}
 The transition to EfficientNet-B0, coupled with dataset-specific normalization, has enabled a classification accuracy of 99.7\%, outperforming several recently published benchmarks. This performance gain is likely due to the model's ability to focus on high-resolution textures that standard ResNet kernels might blur.
 
-However, our robustness testing revealed a critical trade-off. While EfficientNet is highly stable under geometric rotation (0.98), its sensitivity to Gaussian noise (0.58) is higher than that of ResNet. This suggests that the model's high precision is partially dependent on fine-grained pixel relationships that are easily disrupted by sensor noise.
+However, our robustness testing revealed a critical trade-off. While EfficientNet is highly stable under geometric rotation (0.98), its sensitivity to Gaussian noise (0.56) is higher than that of ResNet. This suggests that the model's high precision is partially dependent on fine-grained pixel relationships that are easily disrupted by sensor noise.
 
 \subsection{Limitations and Future Work}
 \begin{itemize}

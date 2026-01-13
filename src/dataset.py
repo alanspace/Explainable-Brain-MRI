@@ -6,14 +6,14 @@ from torch.utils.data import Dataset
 from glob import glob
 
 class BrainTumorDataset(Dataset):
-    def __init__(self, root_dir, transform=None, phase='train'):
+    def __init__(self, root_dir=None, image_paths=None, labels=None, transform=None, phase='train'):
         """
         Args:
-            root_dir (string): Directory with all the images.
-                               Structure: root_dir/class_name/image.jpg
+            root_dir (string, optional): Directory with all the images.
+            image_paths (list, optional): List of absolute paths to images.
+            labels (list, optional): List of integer labels corresponding to image_paths.
             transform (callable, optional): Optional transform to be applied on a sample.
-            phase (string): 'train' or 'test/val'. Used for potential splitting logic 
-                            if data isn't pre-split.
+            phase (string): 'train' or 'test/val'.
         """
         self.root_dir = root_dir
         self.transform = transform
@@ -23,10 +23,15 @@ class BrainTumorDataset(Dataset):
         self.classes = sorted(['glioma', 'meningioma', 'notumor', 'pituitary'])
         self.class_to_idx = {cls_name: i for i, cls_name in enumerate(self.classes)}
         
-        self.image_paths = []
-        self.labels = []
-        
-        self._load_dataset()
+        if image_paths is not None and labels is not None:
+            self.image_paths = image_paths
+            self.labels = labels
+        elif root_dir is not None:
+            self.image_paths = []
+            self.labels = []
+            self._load_dataset()
+        else:
+            raise ValueError("Either root_dir OR (image_paths and labels) must be provided.")
 
     def _load_dataset(self):
         # Assumes structure: root_dir/class_name/*.jpg (or png, jpeg)
