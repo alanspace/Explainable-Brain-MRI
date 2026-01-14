@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.11.25)  11 JAN 2026 17:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.11.25)  14 JAN 2026 00:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**paper.tex
-(./paper.tex
+**src/paper.tex
+(./src/paper.tex
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
 (/usr/local/texlive/2025basic/texmf-dist/tex/latex/base/article.cls
@@ -339,7 +339,7 @@ ef
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count306
 \l__pdf_internal_box=\box56
-) (./paper.aux)
+) (src/paper.aux)
 \openout1 = `paper.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
@@ -420,7 +420,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 Package hyperref Info: Link coloring OFF on input line 27.
- (./paper.out) (./paper.out)
+ (src/paper.out) (src/paper.out)
 \@outlinefile=\write3
 \openout3 = `paper.out'.
 
@@ -445,43 +445,56 @@ Overfull \hbox (16.1711pt too wide) in paragraph at lines 75--76
 File: ../results/glioma_explanation.png Graphic file (type png)
 <use ../results/glioma_explanation.png>
 Package pdftex.def Info: ../results/glioma_explanation.png  used on input line 
-158.
+167.
 (pdftex.def)             Requested size: 135.89174pt x 67.94655pt.
 <../results/meningioma_explanation.png, id=122, 449.68pt x 224.84pt>
 File: ../results/meningioma_explanation.png Graphic file (type png)
 <use ../results/meningioma_explanation.png>
 Package pdftex.def Info: ../results/meningioma_explanation.png  used on input l
-ine 164.
+ine 173.
 (pdftex.def)             Requested size: 135.89174pt x 67.94655pt.
 <../results/notumor_explanation.png, id=123, 449.68pt x 224.84pt>
 File: ../results/notumor_explanation.png Graphic file (type png)
 <use ../results/notumor_explanation.png>
 Package pdftex.def Info: ../results/notumor_explanation.png  used on input line
- 170.
+ 179.
 (pdftex.def)             Requested size: 135.89174pt x 67.94655pt.
 
 
-[4 <../results/glioma_explanation.png (PNG copy)> <../results/meningioma_explan
-ation.png (PNG copy)> <../results/notumor_explanation.png (PNG copy)>]
+[4]
 No file paper.bbl.
 
 
-[5] (./paper.aux)
+[5 <src/../results/glioma_explanation.png (PNG copy)> <src/../results/meningiom
+a_explanation.png (PNG copy)> <src/../results/notumor_explanation.png (PNG copy
+)>]
+
+[6] (src/paper.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
-Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: DC4B626DFC40AEB1FBADCE3E154A746A;3885.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `paper.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `paper.out':
+(rerunfilecheck)             Before: DC4B626DFC40AEB1FBADCE3E154A746A;3885
+(rerunfilecheck)             After:  0BF0B4F8FA205B468A596D50879616EF;4114.
  ) 
 Here is how much of TeX's memory you used:
- 11315 strings out of 474662
- 181091 string characters out of 5751108
+ 11320 strings out of 474662
+ 181183 string characters out of 5751108
  588028 words of memory out of 5000000
- 34198 multiletter control sequences out of 15000+600000
- 566723 words of font info for 63 fonts, out of 8000000 for 9000
+ 34200 multiletter control sequences out of 15000+600000
+ 567177 words of font info for 65 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 75i,11n,79p,958b,530s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,79p,984b,530s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </Users/daai6ga1hou2/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jkn
 appen/ec/tcrm1095.600pk></usr/local/texlive/2025basic/texmf-dist/fonts/type1/pu
 blic/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type
@@ -496,10 +509,10 @@ c/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025
 basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2
 025basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texli
 ve/2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on paper.pdf (5 pages, 548176 bytes).
+Output written on src/paper.pdf (6 pages, 550237 bytes).
 PDF statistics:
- 211 PDF objects out of 1000 (max. 8388607)
- 174 compressed objects within 2 object streams
- 45 named destinations out of 1000 (max. 500000)
+ 216 PDF objects out of 1000 (max. 8388607)
+ 178 compressed objects within 2 object streams
+ 47 named destinations out of 1000 (max. 500000)
  176 words of extra memory for PDF output out of 10000 (max. 10000000)
 

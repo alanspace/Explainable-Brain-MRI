@@ -1,0 +1,10 @@
+5-Fold Cross Validation Results
+==============================
+Fold 1: 99.43%
+Fold 2: 99.22%
+Fold 3: 99.15%
+Fold 4: 99.50%
+Fold 5: 99.22%
+
+Average: 99.30%
+Std Dev: 0.14%
